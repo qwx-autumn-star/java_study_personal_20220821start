@@ -1261,6 +1261,28 @@ List集合：
 			ArrayList（）；//构建一个默认拥有10个元素位置的空列表。
 			ArrayList（Collection<? extends E> C）;//构建一个包含指定Collection类型元素的列表，这些元素的顺序是指定Collection类型的迭代器返回的元素的顺序。
 
+	LinkedList
+		是一种链表结构，对于向集合中插入和删除元素速度较快，但是随机访问的速度较慢（指检索集合中特定索引位置的元素）。
+
+		常用方法：
+			void addFirst(E e) 	将指定元素添加到此集合的开头
+			void addLast(E e) 	将指定元素添加到此集合的末尾
+			E getFirst() 		返回此集合的第一个元素
+			E getLast() 		返回此集合的最后一个元素
+			E removeFirst() 	删除此集合中的第一个元素
+			E removeLast() 		删除此集合中的最后一个元素
+
+	ArrayList和LinkedList之间的练习和区别：
+		ArrayList是基于动态数组实现的，LinkedList是基于链表实现的。其中，ArrayList访问速度优于LinkedList，LinkedList占用空间较大，但批量插入或删除元素时比ArrayList速度快。
+
+		一般来说，速度较快会导致占用空间变大，空间上的节省一般会造成速度变慢。
+
+Set集合：
+	Set集合中的元素是无序的，不可重复的，只能有一个null元素。
+
+	HashSet：
+		
+
 
 @@
 
