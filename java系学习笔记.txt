@@ -1007,6 +1007,10 @@ java数组也是一种数据类型，数组整体属于引用数据类型，当�
 
 	先初始化高维数组，然后再分别逐个初始化低维数组。因为每个低维数组的元素个数是不同的，与规则高维数组包含的个数是不同的。
 
+匿名数组：
+	eg:
+		new type[]{param01,param02};//匿名数组，无法重用
+		
 
 @@
 
@@ -1163,7 +1167,7 @@ finally和return的执行顺序：
 		    Closeable 是 AutoCloseable 的子接口，Closeable 接口里的 close() 方法声明抛出了 IOException，因此它的实现类在实现 close() 方法时只能声明抛出 IOException 或其子类；AutoCloseable 接口里的 close() 方法声明抛出了 Exception，因此它的实现类在实现 close() 方法时可以声明抛出任何异常。
 
     java9+:
-    	Java 9 再次增强了这种 try 语句。Java 9 不要求在 try 后的圆括号内声明并创建资源，只需要自动关闭的资源有 final 修饰或者是有效的 final (effectively final)，Java 9 允许将资源变量放在 try 后的圆括号内。
+    	java 9 再次增强了这种 try 语句。java 9 不要求在 try 后的圆括号内声明并创建资源，只需要自动关闭的资源有 final 修饰或者是有效的 final (effectively final)，java 9 允许将资源变量放在 try 后的圆括号内。
 
 throws和throw：
 	throws声明异常：
@@ -1281,7 +1285,59 @@ Set集合：
 	Set集合中的元素是无序的，不可重复的，可以存在null元素并且最多只能存在一个。
 
 	HashSet：
-		
+		是Set接口的典型实现，是Set接口最常用的实现类，使用Hash算法进行存储，存取和查找性能较好。
+
+		特点：
+			是乱序的。
+			是非同步的，线程不安全。
+			元素可以是null值。
+
+		在向HashSet添加元素时，会调用hashCode()方法获取元素的hashCode值，并根据hashCode值决定元素的存储位置。HashSet中判断两个元素相同的条件时同时满足：通过equals()方法判断返回值为true和两个元素的hashCode的值相等，否则将被视为两个不同的元素。
+
+		常用构造方法：
+			HashSet()；
+			HashSet(Collection<? extends E> C)；
+
+	TreeSet:
+		TreeSet 类同时实现了 Set 接口和 SortedSet 接口。SortedSet 接口是 Set 接口的子接口，可以实现对集合进行自然排序，因此使用 TreeSet 类实现的 Set 接口默认情况下是自然排序的，这里的自然排序指的是升序排序。
+
+		TreeSet 只能对实现了 Comparable 接口的类对象进行排序，因为 Comparable 接口中有一个 compareTo(Object o) 方法用于比较两个对象的大小。
+
+		TreeSet中只能添加相同类型的元素。
+
+		JDK库中实现了Comparable接口的类及比较方法：
+			包装类（BigDecimal、Biglnteger、 Byte、Double、Float、Integer、Long 及 Short) 	按数字大小比较
+			Character 																	按字符的 Unicode 值的数字大小比较
+			String 																		按字符串中字符的 Unicode 值的数字大小比较
+
+		常用方法：
+			E first() 										返回此集合中的第一个元素。其中，E 表示集合中元素的数据类型
+			E last() 										返回此集合中的最后一个元素
+			E poolFirst() 									获取并移除此集合中的第一个元素
+			E poolLast() 									获取并移除此集合中的最后一个元素
+			SortedSet<E> subSet(E fromElement,E toElement) 	返回一个新的集合，新集合包含原集合中 fromElement 对象与 toElement对象之间的所有对象。包含 fromElement 对象，不包含 toElement 对象
+			SortedSet<E> headSet<E toElement〉 				返回一个新的集合，新集合包含原集合中 toElement 对象之前的所有对象。不包含 toElement 对象
+			SortedSet<E> tailSet(E fromElement) 			返回一个新的集合，新集合包含原集合中 fromElement 对象之后的所有对象。包含 fromElement 对象
+
+Map集合：
+	Map中的元素以Key-Value键值对形式保存，用于保存具有映射关系的数据。Map中保存着两组值Key对象组和Value对象组，其中Key和Value可以是任何引用数据类类型的数据，Key不允许重复，Value可以重复。Map中通过指定Key，总能找出唯一且确定的Value，反之则不一定。
+
+	Map接口的常用实现类有HashMap和TreeMap，其中HashMap是Map接口最常用的实现类，以Hash算法存取Key组。TreeMap与HashMap的区别就是可以对Key组进行排序，其使用方法与HashMap基本相同。
+
+	Map接口常用方法：
+		void clear() 								删除该 Map 对象中的所有 key-value 对。
+		boolean containsKey(Object key) 			查询 Map 中是否包含指定的 key，如果包含则返回 true。
+		boolean containsValue(Object value) 		查询 Map 中是否包含一个或多个 value，如果包含则返回 true。
+		V get(Object key) 							返回 Map 集合中指定键对象所对应的值。V 表示值的数据类型
+		V put(K key, V value) 						向 Map 集合中添加键-值对，如果当前 Map 中已有一个与该 key 相等的 key-value 对，则新的 key-value 对会覆盖原来的 key-value 对。
+		void putAll(Map m) 							将指定 Map 中的 key-value 对复制到本 Map 中。
+		V remove(Object key) 						从 Map 集合中删除 key 对应的键-值对，返回 key 对应的 value，如果该 key 不存在，则返回 null
+		boolean remove(Object key, Object value) 	这是 java 8 新增的方法，删除指定 key、value 所对应的 key-value 对。如果从该 Map 中成功地删除该 key-value 对，该方法返回 true，否则返回 false。
+		Set entrySet() 								返回 Map 集合中所有键-值对的 Set 集合，此 Set 集合中元素的数据类型为 Map.Entry
+		Set keySet() 								返回 Map 集合中所有键对象的 Set 集合
+		boolean isEmpty() 							查询该 Map 是否为空（即不包含任何 key-value 对），如果为空则返回 true。
+		int size() 									返回该 Map 里 key-value 对的个数
+		Collection values() 						返回该 Map 里所有 value 组成的 Collection
 
 
 @@
@@ -1290,9 +1346,9 @@ Set集合：
 @反射机制
 
 基本概念：
-	Java 反射机制在一般的 Java 应用开发中很少使用，即便是 Java EE 阶段也很少使用。但应当熟悉其流程、结构和原理，了解细节，因为大部分相关框架等使用了该机制。
+	java 反射机制在一般的 java 应用开发中很少使用，即便是 java EE 阶段也很少使用。但应当熟悉其流程、结构和原理，了解细节，因为大部分相关框架等使用了该机制。
 
-	Java 反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意方法和属性；这种动态获取信息以及动态调用对象方法的功能称为 Java 语言的反射机制。简单来说，反射机制指的是程序在运行时能够获取自身的信息。在 Java 中，只要给定类的名字，就可以通过反射机制来获得类的所有信息。
+	java 反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意方法和属性；这种动态获取信息以及动态调用对象方法的功能称为 java 语言的反射机制。简单来说，反射机制指的是程序在运行时能够获取自身的信息。在 java 中，只要给定类的名字，就可以通过反射机制来获得类的所有信息。
 
 	编译期是指java代码编译陈class字节码文件的时期，运行期是指计算机运行程序，将磁盘中的字节码文件载入到内存中运行的时期。
 
@@ -1305,7 +1361,7 @@ Set集合：
 
 	要想知道一个类的属性和方法，必须先获取到该类的字节码文件对象。获取类的信息时，使用的就是 Class 类中的方法。所以先要获取到每一个字节码文件（.class）对应的 Class 类型的对象。
 
-	Object 类中定义了一个 getClass() 方法，该方法返回同一个类型为 Class 的对象（所有 Java 类均继承了 Object 类）。
+	Object 类中定义了一个 getClass() 方法，该方法返回同一个类型为 Class 的对象（所有 java 类均继承了 Object 类）。
 		eg：
 		    	Class labelCls = label1.getClass();    // label1为 JLabel 类的对象，利用 Class 类的对象 labelCls 可以访问 labelCls 对象的描述信息、JLabel 类的信息以及基类 Object 的信息。
 
@@ -1323,24 +1379,126 @@ Set集合：
 	优缺点:
 		优点：
 		    能够运行时动态获取类的实例，大大提高系统的灵活性和扩展性。
-		    与 Java 动态编译相结合，可以实现无比强大的功能。
-		    对于 Java 这种先编译再运行的语言，能够让我们很方便的创建灵活的代码，这些代码可以在运行时装配，无需在组件之间进行源代码的链接，更加容易实现面向对象。
+		    与 java 动态编译相结合，可以实现无比强大的功能。
+		    对于 java 这种先编译再运行的语言，能够让我们很方便的创建灵活的代码，这些代码可以在运行时装配，无需在组件之间进行源代码的链接，更加容易实现面向对象。
 		缺点：
 		    反射会消耗一定的系统资源，因此，如果不需要动态地创建一个对象，那么就不需要用反射；
 		    反射调用方法时可以忽略权限检查，获取这个类的私有方法和属性，因此可能会破坏类的封装性而导致安全问题。
 
 反射机制API：
-	java.lang.Class 类是 Java 反射机制 API 中的核心类。
+	java.lang.Class 类是 java 反射机制 API 中的核心类。
 
-	
+	Class类的一个实例代表了java的某一种数据类型，如类、接口、枚举、注解、基本数据类型和void，Class类没有公有的构造方法，其实例是由JVM在类加载时自动创建或者在代码中通过类型class静态变量和getClass()方法获取。
+		类名.class；//.class静态变量获取Class实例。
+		对象.getClass()；//getClass()方法获取Class实例。
 
+	每一种类型（包括类和接口），都有一个class静态变量。每一个对象都有getClass()方法。这些都是由超类Object类提供的。
 
+	java.lang.reflect包：
+		Constructor类：提供类的构造方法信息。
+		Field类：提供类或接口中成员变量信息。
+		Method类：提供类或接口成员方法信息。
+		Array类：提供了动态创建和访问java数组的方法。
+		Modifier类：提供类和成员访问修饰符信息。
 
+反射机制访问构造方法:
+	首先，需要获取一个Constructor类型的对象或数组，可以通过以下方法：
+		getConstructors();
+		getConstructor(Class<?>...parameterTypes);
+	 	getDeclaredConstructors();
+		getDeclaredConstructor(Class<?>...parameterTypes);
 
+	访问指定的构造函数，需要通过指定构造方法的参数类型来指定访问。
+		eg:访问一个参数类型依次为int和String类型的构造方法。
+		    objectClass.getDeclaredConstructor(int.class,String.class);
+    		objectClass.getDeclaredConstructor(new Class[]{int.class,String.class});
 
+	创建的每个Constructor对象代表一个构造方法，多个Constructor对象以数组形式返回。
 
+	Constructor类常用方法：
+		isVarArgs() 					查看该构造方法是否允许带可变数量的参数，如果允许，返回 true，否则返回false
+		getParameterTypes() 			按照声明顺序以 Class 数组的形式获取该构造方法各个参数的类型
+		getExceptionTypes() 			以 Class 数组的形式获取该构造方法可能抛出的异常类型
+		newInstance(Object … initargs) 	通过该构造方法利用指定参数创建一个该类型的对象，如果未设置参数则表示采用默认无参的构造方法
+		setAccessiable(boolean flag) 	如果该构造方法的权限为 private，默认为不允许通过反射利用 netlnstance()方法创建对象。如果先执行该方法，并将入口参数设置为 true，则允许创建对象
+		getModifiers() 					获得可以解析出该构造方法所采用修饰符的整数
 
+	java.lang.reflect包中的Modifier类可以用来接受和解析Constructor对象的getMocMers()方法产生的返回值，以获取修饰符信息。也可以使用getModifiers()方法直接获取Modifier对象。
 
+	Modifier类常用静态方法：
+		isStatic(int mod) 		如果使用 static 修饰符修饰则返回 true，否则返回 false
+		isPublic(int mod) 		如果使用 public 修饰符修饰则返回 true，否则返回 false
+		isProtected(int mod) 	如果使用 protected 修饰符修饰则返回 true，否则返回 false
+		isPrivate(int mod) 		如果使用 private 修饰符修饰则返回 true，否则返回 false
+		isFinal(int mod) 		如果使用 final 修饰符修饰则返回 true，否则返回 false
+		toString(int mod) 		以字符串形式返回所有修饰符
+
+反射机制访问方法：
+	首先，需要创建一个Method类型的对象或数组，可以通过以下方法：
+	    getMethods()
+	    getMethods(String name,Class<?> …parameterTypes)
+	    getDeclaredMethods()
+	    getDeclaredMethods(String name,Class<?>...parameterTypes)
+
+    访问指定的方法，需要指定方法的名称和参数类型来指定访问。
+    	eg：访问一个名称为max，参数类型依次为int和String类型的方法。
+		    objectClass.getDeclaredMethod("max",int.class,String.class);
+    		objectClass.getDeclaredMethod("max",new Class[]{int.class,String.class});
+
+	Method类常用方法：
+		getName() 							获取该方法的名称
+		getParameterType() 					按照声明顺序以 Class 数组的形式返回该方法各个参数的类型
+		getReturnType() 					以 Class 对象的形式获得该方法的返回值类型
+		getExceptionTypes() 				以 Class 数组的形式获得该方法可能抛出的异常类型
+		invoke(Object obj,Object...args) 	利用 args 参数执行指定对象 obj 中的该方法，返回值为 Object 类型
+		isVarArgs() 						查看该方法是否允许带有可变数量的参数，如果允许返回 true，否则返回 false
+		getModifiers() 						获得可以解析出该方法所采用修饰符的整数
+
+反射机制访问成员变量：
+	使用如下方法访问成员变量，返回值类型为Field类型的对象或数组：
+	    getFields()
+	    getField(String name)
+	    getDeclaredFields()
+	    getDeclaredField(String name)
+
+    Field常用方法：
+		getName() 							获得该成员变量的名称
+		getType() 							获取表示该成员变量的 Class 对象
+		get(Object obj) 					获得指定对象 obj 中成员变量的值，返回值为 Object 类型
+		set(Object obj, Object value) 		将指定对象 obj 中成员变量的值设置为 value
+		getlnt(0bject obj) 					获得指定对象 obj 中成员类型为 int 的成员变量的值
+		setlnt(0bject obj, int i) 			将指定对象 obj 中成员变量的值设置为 i
+		setFloat(Object obj, float f) 		将指定对象 obj 中成员变量的值设置为 f
+		getBoolean(Object obj) 				获得指定对象 obj 中成员类型为 boolean 的成员变量的值
+		setBoolean(Object obj, boolean b) 	将指定对象 obj 中成员变量的值设置为 b
+		getFloat(Object obj) 				获得指定对象 obj 中成员类型为 float 的成员变量的值
+		setAccessible(boolean flag) 		此方法可以设置是否忽略权限直接访问 private 等私有权限的成员变量
+		getModifiers() 						获得可以解析出该方法所采用修饰符的整数
+
+反射机制访问操作数组：
+	java.lang.reflect包中的Array类产生的对象可以代表任意数组，通过Array类可以动态创建数组和操作数组元素。
+
+	Array类中的几类方法：
+	    static Object newInstance(Class<?> componentType, int…length)；
+	    //创建一个具有指定的元素类型、指定维度的新数组。
+	    static xxx getXxx(Object array, int index)；
+	    //返回 array 数组中第 index 个元素。其中 xxx 是各种基本数据类型，如果数组元素是引用类型，则该方法变为 get(Object array, int index)。
+	    static void setXxx(Object array, int index, xxx val)；
+	    //将 array 数组中第 index 个元素的值设为 val。其中 xxx 是各种基本数据类型，如果数组元素是引用类型，则该方法变成 set(Object array, int index, Object val)。
+
+反射机制操作泛型：
+	JDK1.5+后，Class类增加了泛型功能，允许使用泛型对Class类加以限制。在反射机制中使用泛型，可以避免反射生成的对象需要强制转换。
+		eg:Class<T>反射机制下的泛型形式。
+			String.class 等价于 Class<String>;
+			未知类型.class 等价于 Class<?>;
+
+	泛型和CLass类：
+		使用 Class<T> 泛型可以避免强制类型转换。
+
+		!待补充
+
+	反射机制获取泛型信息：
+		!待补充
 
 
 @@
@@ -1348,7 +1506,8 @@ Set集合：
 
 @输入/输出流
 
-（待补）
+java流的概念：
+	
 
 
 @@
