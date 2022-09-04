@@ -1138,8 +1138,6 @@ try catch finally语句：
 
 	除非在 try 块、catch 块中调用了退出虚拟机的方法System.exit（int status），否则不管在 try 块或者 catch 块中执行怎样的代码，出现怎样的情况，异常处理的 finally 块总会全部执行。
 
-
-
 finally和return的执行顺序：
 	finally 代码块中的 return 语句一定会执行，即finally中的return会导致try与catch被跳过。
 
@@ -1566,6 +1564,8 @@ java流的基本概念及相关：
 				close() 								关闭数据流，当完成对数据流的操作之后需要关闭数据流
 				flush() 								刷新输出流，强行将缓冲区的内容写入输出流
 
+			字符输出流类Writer可以很好地处理java默认编码的Unicode格式的双字节字符流，其方法与用法与OutputStream类基本类似。
+
 系统流：
 	每一个java程序运行时都带有一个系统流，对应的是java.lang.System系统流类，封装了java程序运行时的三个系统流对象（通过in，out，err变量进行引用），如下：
 		System.in：标准输入流，默认设备是键盘。
@@ -1634,7 +1634,143 @@ File文件操作类：
 			windows下路径分隔符是反斜线“\”，java中反斜线代表转义字符开头，如果要正常使用，可以使用两条反斜线“\\”或者直接使用斜线“/”，因为java中默认将斜线看作与平台无关的分隔符含义。
 				eg：windows下“D:\javaspace\hello.java”在java中应当写为“D:/javaspace/hello.java”或者“D:\\javaspace\\hello.java”。
 
-	$$
+			Windows 中使用反斜杠\表示目录的分隔符。Linux 中使用正斜杠/表示目录的分隔符。在操作文件时一定要使用 File.separator 表示分隔符。在程序的开发中，往往会使用 Windows 开发环境，因为在 Windows 操作系统中支持的开发工具较多，使用方便，而在程序发布时往往是直接在 Linux 或其它操作系统上部署，所以这时如果不使用 File.separator，则程序运行就有可能存在问题。
+
+	无论是创建还是删除文件通常都先调用 exists() 方法判断文件是否存在。无论是创建还是删除目录都可以调用 exists() 方法判断目录是否存在。这样可以避免产生意料之外的变动和产生未处理的错误。
+
+动态读取文件内容：
+	动态读取是指从文件的任意位置开始访问文件，而不是必须从文件开始位置读取到文件末尾。动态读取需要用到 Java 中的 RandomAccessFile 类。
+
+	RandomAccessFile 是 Java 输入/输出流体系中功能最丰富的文件内容访问类，它提供了众多的方法来访问文件内容，它既可以读取文件内容，也可以向文件输出数据。由于 RandomAccessFile 可以从任意位置访问文件，所以在只需要访问文件部分内容的情况下，使用 RandonAccessFile 类是一个很好的选择。RandomAccessFile 对象包含了一个记录指针，用以标识当前读写处的位置，当程序新创建一个 RandomAccessFile 对象时，该对象的文件记录指针位于文件头（也就是 0 处），当读/写了 n 个字节后，文件记录指针将会向后移动 n 个字节。除此之外，RandonAccessFile 可以自由移动该记录指针，既可以向前移动，也可以向后移动。
+
+	RandomAccessFile类常用读取和写入数据的方法：
+		boolean readBoolean() 			从文件中读取一个 boolean 值
+		byte readByte() 				从文件中读取一个带符号位的字节
+		char readChar() 				从文件中读取一个字符
+		int readlnt() 					从文件中读取一个带符号位的整数
+		long readLong() 				从文件中读取一个带符号位的 long 值
+		String readLine() 				从文件中读取下一行文本
+		void seek(long pos) 			指定从文件起始位置开始的指针偏移量
+		void writeBoolean(boolean v) 	以字节的形式向文件中写入一个 boolean 值
+		void writeByte(int v) 			以单字节的形式向文件中写入一个 byte 值
+		void writeChar(int v) 			以双字节的形式向文件中写入一个 char 值
+		void writelnt(int v) 			以4字节的形式向文件中写入一个整数
+		writeLong(long v) 				以8字节的形式向文件中写入一个 long 值
+		void writeBytes(String s) 		以字节序列的形式向文件中写入一个字符串
+		void skipBytes(int n) 			以当前文件指针位置为起始点，跳过 n 字节
+
+	RandomAccessFile类构造方法：
+	    RandomAccessFile(File file, String mode)：访问参数 file 指定的文件，访问形式由参数 mode 指定，mode 参数有两个常用的可选值 r 和 rw，其中 r 表示只读，rw 表示读写。
+	    RandomAccessFile(String name, String mode)：访问参数 name 指定的文件，mode 参数的含义同上。
+
+	    	如果使用 rw 方式声明 RandomAccessFile 对象时，要写入的文件不存在，系统将自动进行创建。
+
+	默认情况下向文件中读写中文需要转码，否则会乱码。
+
+字节流应用：
+	InputStream类：
+		使用 InputStream 类的方法可以从流中读取一个或一批字节。
+
+		常用子类：
+		    ByteArrayInputStream 类：将字节数组转换为字节输入流，从中读取字节。
+		    FileInputStream 类：从文件中读取数据。
+		    PipedInputStream 类：连接到一个 PipedOutputStream（管道输出流）。
+		    SequenceInputStream 类：将多个字节输入流串联成一个字节输入流。
+		    ObjectInputStream 类：将对象反序列化。
+
+	    常用方法：
+	    	int read() 								
+	    	/*从输入流中读取一个 8 位的字节，并把它转换为 0~255 的整数，最后返回整数。如果返回 -1，则表示已经到了输入流的末尾。为了提高 I/O 操作的效率，建议尽量使用 read() 方法的另外两种形式*/
+			int read(byte[] b) 						从输入流中读取若干字节，并把它们保存到参数 b 指定的字节数组中。 该方法返回读取的字节数。如果返回 -1，则表示已经到了输入流的末尾
+			int read(byte[] b, int off, int len) 	
+			/*从输入流中读取若干字节，并把它们保存到参数 b 指定的字节数组中。其中，off 指定在字节数组中开始保存数据的起始下标；len 指定读取的字节数。该方法返回实际读取的字节数。如果返回 -1，则表示已经到了输入流的末尾*/
+			void close() 							
+			/*关闭输入流。在读操作完成后，应该关闭输入流，系统将会释放与这个输入流相关的资源。注意，InputStream 类本身的 close() 方法不执行任何操作，但是它的许多子类重写了 close() 方法*/
+			int available() 						返回可以从输入流中读取的字节数
+			long skip(long n) 						从输入流中跳过参数 n 指定数目的字节。该方法返回跳过的字节数
+			void mark(int readLimit) 				在输入流的当前位置开始设置标记，参数 readLimit 则指定了最多被设置标记的字节数
+			boolean markSupported() 				判断当前输入流是否允许设置标记，是则返回 true，否则返回 false
+			void reset() 							将输入流的指针返回到设置标记的起始处
+
+				在使用 mark() 方法和 reset() 方法之前，需要判断该文件系统是否支持这两个方法，以避免对程序造成影响。
+
+	OutputStream类：
+		使用 OutputStream 类的方法可以从流中写入一个或一批字节。
+
+		常用子类：
+		    ByteArrayOutputStream 类：向内存缓冲区的字节数组中写数据。
+		    FileOutputStream 类：向文件中写数据。
+		    PipedOutputStream 类：连接到一个 PipedlntputStream（管道输入流）。
+		    ObjectOutputStream 类：将对象序列化。
+
+	    常用方法：
+			void write(int b) 						向输出流写入一个字节。这里的参数是 int 类型，但是它允许使用表达式，而不用强制转换成 byte 类型。为了提高 I/O 操作的效率，建议尽量使用write() 方法的另外两种形式
+			void write(byte[] b) 					把参数 b 指定的字节数组中的所有字节写到输出流中
+			void write(byte[] b,int off,int len) 	把参数 b 指定的字节数组中的若干字节写到输出流中。其中，off 指定字节数组中的起始下标，len 表示元素个数
+			void close() 							
+			/*关闭输出流。写操作完成后，应该关闭输出流。系统将会释放与这个输出流相关的资源。注意，OutputStream 类本身的 close() 方法不执行任何操作，但是它的许多子类重写了 close() 方法*/
+			void flush() 							
+			/*为了提高效率，在向输出流中写入数据时，数据一般会先保存到内存缓冲区中，只有当缓冲区中的数据达到一定程度时，缓冲区中的数据才会被写入输出流中。使用 flush() 方法则可以强制将缓冲区中的数据写入输出流，并清空缓冲区*/
+
+	常用字节流实现类：
+		字节数组输入流类：
+			ByteArrayInputStream 类从内存的字节数组中读取数据。
+
+			构造方法：
+			    ByteArrayInputStream(byte[] buf)：创建一个字节数组输入流，字节数组类型的数据源由参数 buf 指定。
+			    ByteArrayInputStream(byte[] buf,int offse,int length)：创建一个字节数组输入流，其中，参数 buf 指定字节数组类型的数据源，offset 指定在数组中开始读取数据的起始下标位置，length 指定读取的元素个数。
+
+	    字节数组输出流类：
+	    	ByteArrayOutputStream 类向内存的字节数组中写入数据。
+
+	    	构造方法：
+			    ByteArrayOutputStream()：创建一个字节数组输出流，输出流缓冲区的初始容量大小为 32 字节。
+			    ByteArrayOutputStream(int size)：创建一个字节数组输出流，输出流缓冲区的初始容量大小由参数 size 指定。
+
+		    常用方法：
+			    intsize()：返回缓冲区中的当前字节数。
+			    byte[] toByteArray()：以字节数组的形式返回输出流中的当前内容。
+
+	    文件输入流类：
+	    	FileInputStream 是 Java 流中比较常用的一种，它表示从文件系统的某个文件中获取输入字节。通过使用 FileInputStream 可以访问文件中的一个字节、一批字节或整个文件。在创建 FileInputStream 类的对象时，如果找不到指定的文件将拋出 FileNotFoundException 异常，该异常必须捕获或声明拋出。
+
+	    	FileInputStream 类重写了父类 InputStream 中的 read() 方法、skip() 方法、available() 方法和 close() 方法，不支持 mark() 方法和 reset() 方法。
+
+	    	常用构造方法：
+			    FileInputStream(File file)：通过打开一个到实际文件的连接来创建一个 FileInputStream，该文件通过文件系统中的 File 对象 file 指定。
+			    FileInputStream(String name)：通过打开一个到实际文件的链接来创建一个 FileInputStream，该文件通过文件系统中的路径名 name 指定。
+
+	    文件输出流类：
+	    	FileOutputStream 类继承自 OutputStream 类，重写和实现了父类中的所有方法。FileOutputStream 类的对象表示一个文件字节输出流，可以向流中写入一个字节或一批字节。在创建 FileOutputStream 类的对象时，如果指定的文件不存在，则创建一个新文件；如果文件已存在，则清除原文件的内容重新写入。
+
+	    	常用构造方法：
+			    FileOutputStream(File file)：创建一个文件输出流，参数 file 指定目标文件。
+			    FileOutputStream(File file,boolean append)：
+			    /*创建一个文件输出流，参数 file 指定目标文件，append 指定是否将数据添加到目标文件的内容末尾，如果为 true，则在末尾添加；如果为 false，则覆盖原有内容；其默认值为 false。*/
+			    FileOutputStream(String name)：创建一个文件输出流，参数 name 指定目标文件的文件路径信息。
+			    FileOutputStream(String name,boolean append)：创建一个文件输出流，参数 name 和 append 的含义同上。
+
+			    	其中，使用构造方法 FileOutputStream(String name,boolean append) 创建一个文件输出流对象时，它会将数据附加在现有文件的末尾，该字符串 name 指明了原文件，如果只是为了附加数据而不是重写任何已有的数据，布尔类型参数 append 的值应为 true。在创建 FileOutputStream 对象时，如果将 append 参数设置为 true，则可以在目标文件的内容末尾添加数据，此时目标文件仍然可以暂不存在。
+
+字符流应用：
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    
 
 
 @@
