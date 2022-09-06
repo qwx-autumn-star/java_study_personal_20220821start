@@ -1833,6 +1833,39 @@ File文件操作类：
 		    BufferedWriter(Writer out,int size)：创建一个 BufferedWriter 来修饰参数 out 指定的字符输出流，参数 size 则用于指定缓冲区的大小，单位为字符。
 
 字节流和字符流的区别以及输入流和输出流的区别：
+	按字节流与字符流进行区分：
+	    以 Stream 结尾都是字节流，Reader 和 Writer 结尾都是字符流。
+
+	    读写的时候字节流是按字节读写，字符流按字符读写。在读写文件需要对内容按行处理，比如比较特定字符，处理某一行数据的时候一般会选择字符流。只是读写文件，和文件内容无关时，一般选择字节流。字节流适合所有类型文件的数据传输，因为计算机字节（Byte）是电脑中表示信息含义的最小单位。字符流只能够处理纯文本数据，其他类型数据不行，但是字符流处理文本要比字节流处理文本要方便。
+
+	    其中：
+	    	字节流：
+			    文件流：FileOutputStream 和 FileInputStream
+			    缓冲流：BufferedOutputStream 和 BufferedInputStream
+			    对象流：ObjectOutputStream 和 ObjectInputStream
+
+			    	InputStream 是所有字节输入流的父类，OutputStream 是所有字节输出流的父类。
+
+		    字符流：
+			    转换流：InputStreamReader 和 OutputStreamWriter
+			    缓冲字符流：PrintWriter 和 BufferedReader
+
+			    	Reader 是字符输入流的父类，Writer 是字符输出流的父类。
+
+	按输入流与输出流进行区分：
+		不管从磁盘、网络还是键盘读，读到内存中就是 InputStream。例如：
+			BufferedReader in =  new BufferedReader(new InputStreamReader(new FileInputStream("infilename")));
+
+		不管写到磁盘、网络，或者写到屏幕，都是使用 OutputStream。例如：
+			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("outfilename")));
+
+转换流：
+	InputStreamReader 用于将字节输入流转换为字符输入流，OutputStreamWriter 用于将字节输出流转换为字符输出流。使用转换流可以在一定程度上避免乱码，还可以指定输入输出所使用的字符集。 
+
+	字符流如果可以正常使用是比字节流更加方便的，所以java没有提供字符流转换为字节流的转换流类。
+
+流通过序列化向程序外输入输出对象数据：
+	
 	
 
 
