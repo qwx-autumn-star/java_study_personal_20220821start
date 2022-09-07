@@ -1639,9 +1639,9 @@ File文件操作类：
 	无论是创建还是删除文件通常都先调用 exists() 方法判断文件是否存在。无论是创建还是删除目录都可以调用 exists() 方法判断目录是否存在。这样可以避免产生意料之外的变动和产生未处理的错误。
 
 动态读取文件内容：
-	动态读取是指从文件的任意位置开始访问文件，而不是必须从文件开始位置读取到文件末尾。动态读取需要用到 Java 中的 RandomAccessFile 类。
+	动态读取是指从文件的任意位置开始访问文件，而不是必须从文件开始位置读取到文件末尾。动态读取需要用到 java 中的 RandomAccessFile 类。
 
-	RandomAccessFile 是 Java 输入/输出流体系中功能最丰富的文件内容访问类，它提供了众多的方法来访问文件内容，它既可以读取文件内容，也可以向文件输出数据。由于 RandomAccessFile 可以从任意位置访问文件，所以在只需要访问文件部分内容的情况下，使用 RandonAccessFile 类是一个很好的选择。RandomAccessFile 对象包含了一个记录指针，用以标识当前读写处的位置，当程序新创建一个 RandomAccessFile 对象时，该对象的文件记录指针位于文件头（也就是 0 处），当读/写了 n 个字节后，文件记录指针将会向后移动 n 个字节。除此之外，RandonAccessFile 可以自由移动该记录指针，既可以向前移动，也可以向后移动。
+	RandomAccessFile 是 java 输入/输出流体系中功能最丰富的文件内容访问类，它提供了众多的方法来访问文件内容，它既可以读取文件内容，也可以向文件输出数据。由于 RandomAccessFile 可以从任意位置访问文件，所以在只需要访问文件部分内容的情况下，使用 RandonAccessFile 类是一个很好的选择。RandomAccessFile 对象包含了一个记录指针，用以标识当前读写处的位置，当程序新创建一个 RandomAccessFile 对象时，该对象的文件记录指针位于文件头（也就是 0 处），当读/写了 n 个字节后，文件记录指针将会向后移动 n 个字节。除此之外，RandonAccessFile 可以自由移动该记录指针，既可以向前移动，也可以向后移动。
 
 	RandomAccessFile类常用读取和写入数据的方法：
 		boolean readBoolean() 			从文件中读取一个 boolean 值
@@ -1732,7 +1732,7 @@ File文件操作类：
 			    byte[] toByteArray()：以字节数组的形式返回输出流中的当前内容。
 
 	    文件输入流类：
-	    	FileInputStream 是 Java 流中比较常用的一种，它表示从文件系统的某个文件中获取输入字节。通过使用 FileInputStream 可以访问文件中的一个字节、一批字节或整个文件。在创建 FileInputStream 类的对象时，如果找不到指定的文件将拋出 FileNotFoundException 异常，该异常必须捕获或声明拋出。
+	    	FileInputStream 是 java 流中比较常用的一种，它表示从文件系统的某个文件中获取输入字节。通过使用 FileInputStream 可以访问文件中的一个字节、一批字节或整个文件。在创建 FileInputStream 类的对象时，如果找不到指定的文件将拋出 FileNotFoundException 异常，该异常必须捕获或声明拋出。
 
 	    	FileInputStream 类重写了父类 InputStream 中的 read() 方法、skip() 方法、available() 方法和 close() 方法，不支持 mark() 方法和 reset() 方法。
 
@@ -1864,36 +1864,49 @@ File文件操作类：
 
 	字符流如果可以正常使用是比字节流更加方便的，所以java没有提供字符流转换为字节流的转换流类。
 
-流通过序列化向程序外输入输出对象数据：
-	
-	
+序列化对象的输入输出流：
+	对象序列化（Serialize）指将一个 java 对象写入 IO 流中，与此对应的是，对象的反序列化（Deserialize）则指从 IO 流中恢复该 java 对象。如果想让某个 java 对象能够序列化，则必须让它的类实现 java.io.Serializable 接口。
 
+	Serializable 接口是一个空接口，实现该接口无须实现任何方法，它只是告诉 JVM 该类可以被序列化机制处理。
 
+	ObjectInput 接口与 ObjectOutput 接口分别继承了 DataInput 和 DataOutput  接口，主要提供用于读写基本数据和对象数据的方法。 ObjectInput 接口提供了 readObject() 方法，此方法用于将对象从流中读出。ObjectOutput 提供了 writeObject() 方法，此方法用于将对象写入流中。因为 ObjectInput 与 ObjectOutput 都是接口，所以不能创建对象，只能使用分别实现了这两个接口的 ObjectInputStream 类和 ObjectOutputStream 类来创建对象。
 
+	对象序列化：
+		ObjectOutputStream extends OutputStream implements ObjectOutput；
+			构造方法：
+				public ObjectOutputStream (OutputStream out)；
+				//该构造方法需要传入一个 OutputStream 对象，用来表示将对象二进制流写入到指定的 OutputStream 中。
 
+			首先创建一个 ObjectOutputStream 对象，之后调用 ObjectOutputStream 对象的 writeObject() 方法输出可序列化对象，将对象输出到输出流中。
+				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("object.txt"));// 创建个 ObjectOutputStream 输出流
+				oos.writerObject(per);// 将一个 Person 对象输出到输出流中
 
+		如果某个类的成员变量的类型不是基本类型或 String 类型，而是另一个引用类型，那么这个引用类型必须是可序列化的，否则拥有该类型成员变量的类也是不可序列化的。
 
+	对象反序列化：
+		ObjectInputStream extends InputStream implements ObjectInput；
+			构造方法：
+				public ObjectInputStream(InputStream out)；
+				//该构造方法需要传入一个 InputStream 对象，用来表示从指定 InputStream 读取对象。
 
+			首先创建一个 ObjectInputStream 输入流，这个输入流是一个处理流，所以必须建立在其他节点流的基础之上，之后调用 ObjectInputStream 对象的 readObject() 方法读取流中的对象，该方法返回一个 Object 类型的 java 对象，如果程序知道该 java 对象的类型，则可以将该对象强制类型转换成其真实的类型。
+				ObjectInputStream ois = new ObjectInputStream (new FileInputStream ("object. txt"));// 创建一个ObjectInputStream输入流
+				Person P = (Person)ois.readObject();// 从输入流中读取一个java对象，并将其强制类型转换为Person类
 
+		反序列化读取的仅仅是 java 对象的数据，而不是 java 类，因此采用反序列化恢复 java 对象时，必须提供该 java 对象所属类的 class 文件，否则将会引发 ClassNotFoundException 异常。
 
-	
+		当反序列化读取 java 对象时，反序列化机制无须通过构造器来初始化 java 对象。如果使用序列化机制向文件中写入了多个 java 对象，使用反序列化机制恢复对象时必须按实际写入的顺序读取。
 
+		当一个可序列化类有多个父类时（包括直接父类和间接父类），这些父类要么有无参数的构造方法，要么也是可序列化的，否则反序列化时将抛出 InvalidClassException 异常。如果父类是不可序列化的，只是带有无参数的构造方法，则该父类中定义的成员变量值不会序列化到 IO 流中。 
 
+	java序列化编号：
+		类的序列化编号（serialVersionUID）是用确认序列化的对象的一致性的。在反序列化时，JVM 会把传来字节流中的序列化编号和本地相应实体类的序列化编号进行比较，如果相同就认为一致，可以进行反序列化，否则会抛出 InvalidCastException 异常。
 
+		序列化编号有两种显式生成方式：
+			默认的1L，比如：private static final long serialVersionUID = 1L。
+    		根据类名、接口名、成员方法及属性等来生成一个 64 位的哈希字段。
 
-
-
-
-
-
-
-
-
-
-
-    
-
-    
+		当实现 Serializable 接口的对象没有显式定义一个序列化编号时，java 序列化会根据编译的 Class 自动生成一个序列化编号，这种情况下只要 class 文件发生变化，序列化号就会改变，否则一直不变。
 
 
 @@
