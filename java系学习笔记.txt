@@ -195,7 +195,15 @@ java的三大特征：封装，继承，多态（多态性体现在父类中定�
     private：私有访问。只对同一个类可见，其余都不可见（同类）。
 
     远近关系的权限限制上，同类<同包<子类<其他包。
+
     在 java 中能够影响到访问权限的只有 private、public、protected、friendly 这几个关键字。
+
+    类的修饰权限符：
+	    外部类只能有两种访问控制级别： public 和friendly。因为外部类没有处于任何类的内部，也就没有其所在类的内部、所在类的子类两个范围，因此 private 和 protected 访问控制符对外部类没有意义。
+
+	    内部类的上一级程序单元是外部类，它具有 4 个作用域：同一个类（ private ）、同一个包（ protected ）和任何位置（ public ）。
+
+	    因为局部成员（包含局部内部类）的作用域是所在方法，其他程序单元永远不可能访问另一个方法中的局部变量，所以所有的局部成员都不能使用访问控制修饰符修饰。
 
 this关键字：
 	this 可以代表任何对象，当这个方法被调用时，它所代表的对象才被确定下来，谁在调用这个方法，this 就代表谁。
@@ -1337,6 +1345,9 @@ Map集合：
 		int size() 									返回该 Map 里 key-value 对的个数
 		Collection values() 						返回该 Map 里所有 value 组成的 Collection
 
+Map集合的遍历：
+	
+
 
 @@
 
@@ -1361,7 +1372,7 @@ Map集合：
 
 	Object 类中定义了一个 getClass() 方法，该方法返回同一个类型为 Class 的对象（所有 java 类均继承了 Object 类）。
 		eg：
-		    	Class labelCls = label1.getClass();    // label1为 JLabel 类的对象，利用 Class 类的对象 labelCls 可以访问 labelCls 对象的描述信息、JLabel 类的信息以及基类 Object 的信息。
+	    	Class labelCls = label1.getClass();    // label1为 JLabel 类的对象，利用 Class 类的对象 labelCls 可以访问 labelCls 对象的描述信息、JLabel 类的信息以及基类 Object 的信息。
 
 		通过labelCls可以获取的：
 			包路径 				getPackage() 			Package 对象 		获取该类的存放路径
@@ -1505,6 +1516,38 @@ Map集合：
 					ParameterizedType类代表被参数化的类型，是增加了泛型限制的类型，提供的方法如下：
 						getRawType()；//返回没有泛型信息的原始类型。
 						getActualTypeArguments()；//返回有泛型的参数的类型。
+
+反射机制获取注解信息：
+	获取类、方法或变量的注解信息，必须通过 Java 的反射技术来获取 Annotation 对象。
+
+	所有 Java 注解类型都继承于 java.lang.annotation.Annotation 接口，该接口代表程序中可以接收注解的程序元素。
+		主要实现类：
+		    Class：			类定义。
+		    Constructor：	构造方法定义。
+		    Field：			类的成员变量定义。
+		    Method：			类的方法定义。
+		    Package：		类的包定义。
+
+    jdk5+之后，java.lang.reflect 包所提供的反射 API 增加了读取运行时注解的能力。只有当定义注解时使用了 @Retention(RetentionPolicy.RUNTIME) 修饰，该注解才会在运行时可见。
+
+    AnnotatedElement 接口是所有程序元素（如 Class、Method、Constructor 等）的父接口，所以程序通过反射获取了某个类的 AnnotatedElement 对象（如 Class、Method、 Constructor 等）之后，程序就可以调用该对象的方法来访问注解信息。
+    	常用方法：
+			<A extends Annotation> A getAnnotation(Class<A> annotationClass) 			如果该元素存在 annotationClass 类型的注解，则返回注解，否则返回 null
+			<A extends Annotation> A getDeclaredAnnotation(Class<A> annotationClass) 	这是 Java 8 新增的方法，该方法尝试获取直接修饰该程序元素、指定类型的注解。如果该类型的注解不存在，则返回 null
+			Annotation[] getAnnotations() 												返回该元素上存在的所有注解
+			Annotation[] getDeclaredAnnotations() 										返回直接存在于该元素的所有注解（和 getAnnotations() 的区别在于该方法将不返回继承的注释）
+			boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) 	判断该元素上是否存在 annotationClass 类型的注解，如果存在则返回 true，否则返回 false。
+			<A extends Annotation> A[] getAnnotationsByType(Class<A> annotationClass) 	
+			/*该方法与前面介绍的 getAnnotation() 方法基本相似。但由于 Java 8 增加了重复注解功能，因此需要使用该方法获取该元素存在 annotationClass 类型的多个注解。*/
+			<A extends Annotation> A[] getDeclaredAnnotationsByType(Class<A> annotationClass) 	
+			/*该方法与前面介绍的 getDeclaredAnnotations() 方法基本相似。但由于 Java 8 增加了重复注解功能，因此需要使用该方法获取该元素存在 annotationClass 类型的多个注解。*/
+
+				命名规则：
+				    getDeclaredAnnotationXXXX：	只可以获取直接存在的注解信息，即直接修饰在某个元素（类、属性和方法）上的注解。
+				    getXXXXByType：				可以获取间接存在的注解信息
+				    getAnnotationXXX：			可以获取继承的注解信息
+
+				    	所有的方法都可以获取直接注解信息 
 
 
 @@
@@ -1914,17 +1957,125 @@ File文件操作类：
 
 @java注解
 
-（待补）
+注解(Annotation)基本概念：
+	在jdk5+之后，可以在源代码中嵌入一些补充信息，这种补充信息以@开头，被称为注解,注解的也是一种数据类型，本质上是一种接口类型。注解不能改变程序的运行结果，也不会影响程序运行的性能。注解可以在编译时给出提示或警告，在运行时读写字节码文件。
 
+	常见作用：
+	    生成帮助文档。
+	    跟踪代码依赖性，实现替代配置文件功能（Spring2.5开始支持的基于注解配置就是一个例子）。
+	    在编译时进行格式检查。
 
-@@
+    到 Java 8 为止 Java SE 提供了 11 个内置注解。其中有 5 个是基本注解，它们来自于 java.lang 包。有 6 个是元注解（元注解就是负责注解其他的注解），它们来自于 java.lang.annotation 包，自定义注解会用到元注解。
 
+    基本注解包括：
+    	@Override
+    	@Deprecated
+    	@SuppressWarnings
+    	@SafeVarargs
+    	@FunctionalInterface。
 
-@java待分类
+（@Override）注解：
+	用来指定方法重写，只能修饰方法并且只能用于方法重写，不能修饰其它的元素。它可以强制一个子类必须重写父类方法或者实现接口的方法。作用是告诉编译器检查这个方法，保证父类要包含一个被该方法重写的方法，否则就会编译出错。这样可以帮助程序员避免一些低级错误。
 
+（@Deprecated）注解：
+	可以用来注解类、接口、成员方法和成员变量等，用于表示某个元素（类、方法等）已过时。当其他程序使用已过时的元素时，编译器将会给出警告（比如Eclipse编辑器中的程序代码会有删除线和编译警告）。
 
+	java9+之后的版本为 @Deprecated 注解增加了以下两个属性： 
+	    forRemoval：该 boolean 类型的属性指定该 API 在将来是否会被删除。
+	    since：该 String 类型的属性指定该 API 从哪个版本被标记为过时。
 
+	    	eg:@Deprecated(since = "9", forRemoval = true);
 
+（@SuppressWarnings）注解：
+	被该注解修饰的程序元素（以及该程序元素中的所有子元素）取消显示指定的编译器警告，且会一直作用于该程序元素的所有子元素。
+
+	关键字：
+		all 						抑制所有警告
+		boxing 						抑制装箱、拆箱操作时候的警告
+		cast 						抑制映射相关的警告
+		dep-ann 					抑制启用注释的警告
+		deprecation 				抑制过期方法警告
+		fallthrough 				抑制在 switch 中缺失 breaks 的警告
+		finally 					抑制 finally 模块没有返回的警告
+		hiding 						抑制相对于隐藏变量的局部变量的警告
+		incomplete-switch 			忽略不完整的 switch 语句
+		nls 						忽略非 nls 格式的字符
+		null 						忽略对 null 的操作
+		rawtypes 					使用 generics 时忽略没有指定相应的类型
+		restriction 				抑制禁止使用劝阻或禁止引用的警告
+		serial 						忽略在 serializable 类中没有声明 serialVersionUID 变量
+		static-access 				抑制不正确的静态访问方式警告
+		synthetic-access 			抑制子类没有按最优方法访问内部类的警告
+		unchecked 					抑制没有进行类型检查操作的警告
+		unqualified-field-access 	抑制没有权限访问的域的警告
+		unused 						抑制没被使用过的代码的警告
+
+			eg：
+				抑制单类型的警告：@SuppressWarnings("unchecked");
+				抑制多类型的警告：@SuppressWarnings("unchecked","rawtypes");
+
+（@SafeVarargs）注解:
+	用来抑制未检查不安全代码（unchecked）警告，并且相较于@SuppressWarnings（"unchecked"）注释更加适合本警告。@SafeVarargs注解不适用于非 static 或非 final 声明的方法，对于未声明为 static 或 final 的方法，如果要抑制 unchecked 警告，可以使用 @SuppressWarnings 注解。
+
+（@FunctionalInterface）注解：
+	用来指定某个接口必须是函数式接口，所以 @FunInterface 只能修饰接口，不能修饰其它程序元素。
+
+元注解：
+	元注解是负责对其它注解进行说明的注解，自定义注解时可以使用元注解。
+
+	jdk5+：@Documented、@Target、@Retention、@Inherited。
+	jdk8+：@Repeatable 、 @Native 。
+
+	注解@Documented：
+		@Documented 是一个标记注解，没有成员变量。用 @Documented 注解修饰的注解类会被 JavaDoc 工具提取成文档。默认情况下，JavaDoc 是不包括注解的，但如果声明注解时指定了 @Documented，就会被 JavaDoc 之类的工具处理。
+
+	注解@Target：
+		@Target 注解用来指定一个注解的使用范围，即被 @Target 修饰的注解可以用在什么地方。@Target 注解有一个成员变量（value）用来设置适用目标，value 是 java.lang.annotation.ElementType 枚举类型的数组。
+
+			 ElementType 常用的枚举常量；
+			 	CONSTRUCTOR 	用于构造方法
+				FIELD 			用于成员变量（包括枚举常量）
+				LOCAL_VARIABLE 	用于局部变量
+				METHOD 			用于方法
+				PACKAGE 		用于包
+				PARAMETER 		用于类型参数（JDK 1.8新增）
+				TYPE 			用于类、接口（包括注解类型）或 enum 声明
+
+				eg:@Target({ ElementType.METHOD });
+
+	注解@Retention：
+		@Retention 用于描述注解的生命周期，也就是该注解被保留的时间长短。@Retention 注解中的成员变量（value）用来设置保留策略，value 是 java.lang.annotation.RetentionPolicy 枚举类型。
+
+			RetentionPolicy的3 个枚举常量：
+			    SOURCE：在源文件中有效（即源文件保留）
+			    CLASS：在 class 文件中有效（即 class 保留）
+			    RUNTIME：在运行时有效（即运行时保留）
+
+			    	生命周期大小排序为 SOURCE < CLASS < RUNTIME，前者能使用的地方后者一定也能使用。
+
+	注解@Inherited：
+		@Inherited 是一个标记注解，用来指定该注解可以被继承。使用 @Inherited 注解的 Class 类，表示这个注解可以被用于该 Class 类的子类。就是说如果某个类使用了被 @Inherited 修饰的注解，则其子类将自动具有该注解。 
+
+	注解@Repeatable：
+		@Repeatable 注解是 jdk8+ 新增加的，它允许在相同的程序元素中重复注解，在需要对同一种注解多次使用时，往往需要借助 @Repeatable 注解。jdk8版本以前，同一个程序元素前最多只能有一个相同类型的注解，如果需要在同一个元素前使用多个相同类型的注解，则必须使用注解“容器”。 重复注解只是一种简化写法，这种简化写法是一种假象，多个重复注解其实会被作为“容器”注解的 value 成员的数组元素处理。
+
+	注解@Native；
+		使用 @Native 注解修饰成员变量，则表示这个变量可以被本地代码引用，常常被代码生成工具使用。对于 @Native 注解不常使用，了解即可。
+
+自定义注解：
+	区别于基本注解和元注解，自定义注解如字面意思是自行定义的注解。默认情况下，注解可以在程序的任何地方使用，通常用于修饰类、接口、方法和变量等。
+
+	声明自定义注解使用 @interface 关键字（interface 关键字前加 @ 符号）实现。
+		eg：public @interface Test {}；
+
+	定义注解和定义类相似，注解前面的访问修饰符和类一样有两种，分别是公有访问权限（public）和默认访问权限（默认不写），其中的成员变量也可以有访问权限修饰符，但是只能有公有权限和默认权限。一个源程序文件中可以声明多个注解，但只能有一个是公有访问权限的注解。且源程序文件命名和公有访问权限的注解名一致。
+
+	不包含任何成员变量的注解称为标记注解。如果在注解里定义了成员变量，那么使用该注解时就应该为它的成员变量指定值。注解中的成员变量也可以有默认值，可使用 default 关键字。如果为注解的成员变量指定了默认值，那么使用该注解时就可以不为这些成员变量赋值，而是直接使用默认值。也可以在使用 MyTag 注解时为成员变量指定值，如果为 MyTag 的成员变量指定了值，则默认值不会起作用。
+
+	根据注解是否包含成员变量，可以分为如下两类。
+
+	    标记注解：没有定义成员变量的注解类型被称为标记注解。这种注解仅利用自身的存在与否来提供信息，如前面介绍的 @Override、@Test 等都是标记注解。
+	    元数据注解：包含成员变量的注解，因为它们可以接受更多的元数据，所以也被称为元数据注解。
 
 
 @@
