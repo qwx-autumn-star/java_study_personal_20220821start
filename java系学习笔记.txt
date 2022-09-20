@@ -1230,7 +1230,7 @@ throws和throw：
 java所有集合类都位于java.util包下，集合中只能保存对象（实际上保存的是对象的引用变量）。
 
 结构：
-	Collection extends Iterator;
+	Collection extends Iterator(i);
 	Queue,List,Set implements Collection;
 	PriorityQueue,Dueue implements Queue;
 	LinkedList,ArrayList,vector implements List;
@@ -1346,7 +1346,198 @@ Map集合：
 		Collection values() 						返回该 Map 里所有 value 组成的 Collection
 
 Map集合的遍历：
+	在 for 循环中使用 entrySet 实现 Map 的遍历（最常见和最常用的）：
+	    for (Map.Entry<String, String> entry : map.entrySet()) {
+        String mapKey = entry.getKey();
+        String mapValue = entry.getValue();
+        System.out.println(mapKey + "：" + mapValue);}
+
+    使用 for-each 循环遍历 key 或者 values，一般适用于只需要 Map 中的 key 或者 value 时使用（性能上比 entrySet 较好。 ）：
+    	for (String key : map.keySet()) {
+   		System.out.println(key);}
+		for (String value : map.values()) {
+    	System.out.println(value);}
+
+	使用迭代器（Iterator）遍历：
+		Iterator<Entry<String, String>> entries = map.entrySet().iterator();
+		while (entries.hasNext()) {
+	    Entry<String, String> entry = entries.next();
+	    String key = entry.getKey();
+	    String value = entry.getValue();
+	    System.out.println(key + ":" + value);}
+
+    通过键找值遍历（这种方式的效率比较低，因为本身从键取值是耗时的操作）：
+	    for(String key : map.keySet()){
+        String value = map.get(key);
+        System.out.println(key+":"+value); }
+
+java8+ Map中新增的方法：
+	boolean replace(K key, V oldValue, V newValue) 			将 Map 中指定 key-value 对的原 value 替换成新 value。如果在 Map 中找到指定的 key-value 对，则执行替换并返回 true，否则返回 false。
+	replaceAll(BiFunction function) 						该方法使用 BiFunction 对原 key-value 对执行计算，并将计算结果作为该 key-value 对的 value 值。
+	void forEach(BiConsumer action) 						该方法是 Java 8 为 Map 新增的一个遍历 key-value 对的方法，通过该方法可以更简洁地遍历 Map 的 key-value 对。
+	Object getOrDefault(Object key, V defaultValue) 		获取指定 key 对应的 value。如果该 key 不存在，则返回 defaultValue。
+	Object putIfAbsent(Object key, Object value) 			该方法会自动检测指定 key 对应的 value 是否为 null，如果该 key 对应的 value 为 null，该方法将会用新 value 代替原来的 null 值。
+	Object replace(Object key, Object value) 			
+	//将 Map 中指定 key 对应的 value 替换成新 value。与传统 put() 方法不同的是，该方法不可能添加新的 key-value 对。如果尝试替换的 key 在原 Map 中不存在，该方法不会添加 key-value 对，而是返回 null。
+	Object compute(Object key, BiFunction remappingFunction) 	
+	/*该方法使用 remappingFunction 根据原 key-value 对计算一个新 value。只要新 value 不为 null，就使用新 value 覆盖原 value；如果原 value 不为 null，但新 value 为 null，则删除原 key-value 对；如果原 value、新 value 同时为 null，那么该方法不改变任何 key-value 对，直接返回 null。*/
+	Object computeIfAbsent(Object key, Function mappingFunction) 	
+	/*如果传给该方法的 key 参数在 Map 中对应的 value 为 null，则使用 mappingFunction 根据 key 计算一个新的结果，如果计算结果不为 null，则用计算结果覆盖原有的 value。如果原 Map 原来不包括该 key，那么该方法可能会添加一组 key-value 对。*/
+	Object computeIfPresent(Object key, BiFunction remappingFunction) 	
+	/*如果传给该方法的 key 参数在 Map 中对应的 value 不为 null，该方法将使用 remappingFunction 根据原 key、value 计算一个新的结果，如果计算结果不为 null，则使用该结果覆盖原来的 value；如果计算结果为 null，则删除原 key-value 对。*/
+	Object merge(Object key, Object value, BiFunction remappingFunction) 	
+	/*该方法会先根据 key 参数获取该 Map 中对应的 value。如果获取的 value 为 null，则直接用传入的 value 覆盖原有的 value（在这种情况下，可能要添加一组 key-value 对）；如果获取的 value 不为 null，则使用 remappingFunction 函数根据原 value、新 value 计算一个新的结果，并用得到的结果去覆盖原有的 value。*/
 	
+Collections类（操作集合工具类）：
+	Collections 类是 Java 提供的一个操作 Set、List 和 Map 等集合的工具类。Collections 类提供了许多操作集合的静态方法，借助这些静态方法可以实现集合元素的排序、查找替换和复制等操作。
+
+	排序（正向和逆向）：
+	    void reverse(List list)：				对指定 List 集合元素进行逆向排序。
+	    void shuffle(List list)：				对 List 集合元素进行随机排序（shuffle 方法模拟了“洗牌”动作）。
+	    void sort(List list)：					根据元素的自然顺序对指定 List 集合的元素按升序进行排序。
+	    void sort(List list, Comparator c)：		根据指定 Comparator 产生的顺序对 List 集合元素进行排序。
+	    void swap(List list, int i, int j)：		将指定 List 集合中的 i 处元素和 j 处元素进行交换。
+	    void rotate(List list, int distance)：	当 distance 为正数时，将 list 集合的后 distance 个元素“整体”移到前面；当 distance 为负数时，将 list 集合的前 distance 个元素“整体”移到后面。该方法不会改变集合的长度。
+
+    查找、替换操作：
+	    int binarySearch(List list, Object key)：						使用二分搜索法搜索指定的 List 集合，以获得指定对象在 List 集合中的索引。如果要使该方法可以正常工作，则必须保证 List 中的元素已经处于有序状态。
+	    Object max(Collection coll)：									根据元素的自然顺序，返回给定集合中的最大元素。
+	    Object max(Collection coll, Comparator comp)：					根据 Comparator 指定的顺序，返回给定集合中的最大元素。
+	    Object min(Collection coll)：									根据元素的自然顺序，返回给定集合中的最小元素。
+	    Object min(Collection coll, Comparator comp)：					根据 Comparator 指定的顺序，返回给定集合中的最小元素。
+	    void fill(List list, Object obj)：								使用指定元素 obj 替换指定 List 集合中的所有元素。
+	    int frequency(Collection c, Object o)：							返回指定集合中指定元素的出现次数。
+	    int indexOfSubList(List source, List target)：					返回子 List 对象在父 List 对象中第一次出现的位置索引；如果父 List 中没有出现这样的子 List，则返回 -1。
+	    int lastIndexOfSubList(List source, List target)：				返回子 List 对象在父 List 对象中最后一次出现的位置索引；如果父 List 中没有岀现这样的子 List，则返回 -1。
+	    boolean replaceAll(List list, Object oldVal, Object newVal)：	使用一个新值 newVal 替换 List 对象的所有旧值 oldVal。
+
+    复制：
+    	Collections类的静态方法copy()用于将指定集合中的所有元素复制到另一个集合中，执行后目标集合中已复制元素的索引等同于源集合中元素的索引。
+
+    	语法格式：
+    		void copy(List <? super T> dest,List<? extends T> src);
+
+		copy()方法中目标集合的长度必须不小于源集合的长度，否则会抛出IndexOutOfBoundsException异常，目标集合长度大于源集合长度则无影响。
+
+Lambda表达式遍历Collection集合：
+	jdk8+后Collection接口继承的Iterable接口新增了forEach(Consumer action)方法，其参数类型是一个函数式接口，Collection集合可以直接调用该方法。
+
+	eg:
+		objs.forEach(obj -> System.out.println("迭代集合元素："+obj))；
+
+Iterator遍历Collection集合：
+	Iterator 接口里定义了如下 4 个方法：
+	    boolean hasNext()：						如果被迭代的集合元素还没有被遍历完，则返回 true。
+	    Object next()：							返回集合里的下一个元素。
+	    void remove()：							删除集合里上一次 next 方法返回的元素。
+	    void forEachRemaining(Consumer action)：	这是 jdk8+ 为 Iterator 新增的默认方法，该方法可使用 Lambda 表达式来遍历集合元素。
+
+    Iterator it =objs.iterator()；//获取集合的迭代器。
+
+    Iterator迭代器必须依附于Collection对象，存在一个Iterator对象，必然存在一个对应的Collecion集合对象，没有集合依附的Iterator对象没有存在的价值。当使用Iterator遍历集合时，并不会影响集合中的元素，而是传递了元素的值。除非使用Iterator的remove()方法删除上一次next()方法返回的集合元素，否则在Iterator迭代访问Collection集合时修改Collection集合会导致抛出java.util.ConcurrentModificationException异常。这是因为Iterator迭代其采取的是快速失败(fail-fast)机制，不会显示修改后的结果而是直接抛出异常。
+
+Lambda表达式遍历Iterator迭代器：
+	jdk8+为Iterator接口新增了默认方法forEachRemaining(Consumer action),接口的“默认方法”是jdk8+提供的新特性。
+
+	eg：
+		Iterator it=objs.iterator();
+		it.forEachRemaing(obj -> System.out.println("迭代元素集合："+obj));
+
+foreach循环形式遍历Collection集合：
+	jdk5+提供了foreach循环形式，可以用来遍历Collection集合。
+
+	eg：
+		for(Object obj : objs){System.out.println(objs);}
+
+	foreach循环形式仅仅是传递了值，不会影响Collection集合中的元素，foreach循环访问Collection集合时，集合不可以被修改，否则会引发CocurrentModificationException异常。
+
+Predicate操作Collection集合：
+	jdk8+新增了Collection集合的removeIf(Predicate filter)方法，Predicate是函数式接口，所以该方法可以使用Lambda表达式形式。
+
+	eg：
+		objs.removeIf(ele -> ((String)ele).length() <12);
+		//所有长度小于12的字符串元素都会被删除。
+
+Stream操作Collection集合：
+	jdk8+新增了元素类型为int、long、double的流的IntStream、LongStream、DoubleStream流式API，以及通用的流接口Stream。创建这些流式API需要对应的NAME.Builder来获取对应的流。
+
+	使用流程：
+		1，使用NAME.builder()创建对应的Builder。
+		2，重复调用Builder的add()方法向流中添加元素。
+		3，使用Builder的build()方法获取对应的Stream。
+		4，调用Stream的聚集方法。
+
+		eg：
+			IntStream is=IntStream.builder().add(11).add(12).add(13).build();//1-3步骤。
+
+	聚集方法：
+		聚集方法分为中间方法（intermediate）和末端方法（terminal）。
+
+		中间方法；
+			允许流保持打开状态，并且可以直接调用后续的方法，返回值是另外一个流。
+
+		末端方法：
+			末端方法是对流的最终操作，流执行末端方法后，流会被“消耗”且不可再次使用。
+
+	流的方法具有如下两个特征：
+		有状态的方法：会给流添加一些新的属性，但需要更大的性能开销。
+
+		短路方法：可以今早结束对流的操作，不必检查所有的元素。
+
+	Stream常用方法：
+		中间方法：
+			filter(Predicate predicate) 	过滤 Stream 中所有不符合 predicate 的元素
+			mapToXxx(ToXxxFunction mapper) 	使用 ToXxxFunction 对流中的元素执行一对一的转换，该方法返回的新流中包含了 ToXxxFunction 转换生成的所有元素。
+			peek(Consumer action) 			依次对每个元素执行一些操作，该方法返回的流与原有流包含相同的元素。该方法主要用于调试。
+			distinct() 						该方法用于排序流中所有重复的元素（判断元素重复的标准是使用 equals() 比较返回 true）。这是一个有状态的方法。
+			sorted() 						该方法用于保证流中的元素在后续的访问中处于有序状态。这是一个有状态的方法。
+			limit(long maxSize) 			该方法用于保证对该流的后续访问中最大允许访问的元素个数。这是一个有状态的、短路方法。
+
+		末端方法：
+			forEach(Consumer action) 		遍历流中所有元素，对每个元素执行action
+			toArray() 						将流中所有元素转换为一个数组
+			reduce() 						该方法有三个重载的版本，都用于通过某种操作来合并流中的元素
+			min() 							返回流中所有元素的最小值
+			max() 							返回流中所有元素的最大值
+			count() 						返回流中所有元素的数量
+			anyMatch(Predicate predicate) 	判断流中是否至少包含一个元素符合 Predicate 条件。
+			allMatch(Predicate predicate) 	判断流中是否每个元素都符合 Predicate 条件
+			noneMatch(Predicate predicate) 	判断流中是否所有元素都不符合 Predicate 条件
+			findFirst() 					返回流中的第一个元素
+			findAny() 						返回流中的任意一个元素
+
+	jdk8+允许使用流式API操作集合，Collection接口提供了一个默认方法stream()返回该集合对应的流，接下来通过流式API操作集合元素和进行整体的聚集操作。
+
+不可变集合：
+	不可变代表不能对集合进行添加或删除元素操作。
+
+	jdk9+支持的of()方法简化了创建集合的流程，可以以一行代码就创建包含n个元素的不可变集合。
+
+	eg：
+		Set set=Set.of("java","kotlin","Go");
+		List list=List.of(32,-12,3);
+		Map map=Map.of("语文",91,"数学"，92，"英语"，93);
+		//Map类型的不可变集合的创建在of()方法中依次传入多个key-value即可，也可以使用ofEntries()方法，该方法可以接受多个Entry对象，可以使用Map.entry()显式创建Map.Entry对象（即一个key-value键值对对象）。
+
+菱形语法：
+	jdk7+支持在构造器后不带完整的泛型信息，只给出一对尖括号即可，java会自动推断出尖括号内的信息。
+
+	eg：
+		List<String> list=new ArrayList<String>();
+		//未使用菱形语法
+		List<String> list=new ArrayList<>();
+		//菱形语法
+
+	jdk9+再次增强了菱形语法，也允许在创建匿名内部类时使用菱形语法，java会根据上下文推断出内部类中泛型的信息。
+
+泛型：
+	
+
+
+
+
+		
+
 
 
 @@
