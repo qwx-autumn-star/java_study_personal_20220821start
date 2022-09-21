@@ -1531,13 +1531,88 @@ Stream操作Collection集合：
 	jdk9+再次增强了菱形语法，也允许在创建匿名内部类时使用菱形语法，java会根据上下文推断出内部类中泛型的信息。
 
 泛型：
-	
+	jdk5+提供了对泛型的支持，泛型可以在编译期间检查类型安全，并且所有被需要的强制类型转换都会转变为自动和隐式的，提高了代码的重用率。泛型本质上是提供类型的类型参数，当为类、接口或方法指定类型参数时，通过类型参数限制了操作的数据类型，保证了类型转换的绝对安全。
 
+	泛型在集合中的应用：
+		Map<Integer,Book> books=new HashMap<Integer,Book>();
 
+	泛型在类中的应用：
+		public class class_name<data_type1,data_type2>{};
 
+		泛型类一般用于类中属性的类型不确定的情况，即泛型在类中一般用于指定属性的类型。在实例化泛型类时，需要指明泛型类中的类型参数，并赋予被泛型指定类型的属性的值。
 
-		
+	泛型在方法中的应用：
+		[访问权限修饰符] [static] [final] <类型参数> 返回值类型 方法名([形参列表]);
 
+		是否拥有泛型方法与是否是泛型类没有关系，两者同时存在时指定的泛型相互之间没有关系。当仅仅需要泛型方法而不是泛型类时，应当选用泛型方法。
+
+		static方法无法访问泛型类的类型参数，如果static方法需要使用泛型能力，则必须使用static<T>形式将其变为泛型方法。
+
+	泛型的高级用法：
+		限制泛型可用类型：
+			class class_name<T extends anyClass>;
+			//泛型被限制为必须直接或间接实现了或继承了anyClass这个接口或类，且extends不论anyclass是接口还是类在此处为固定用法。
+
+				当没有使用extends形式限制泛型时，其实是默认以Object作为anyClass作为泛型类型的限制。
+
+		使用类型通配符：
+			泛型类名称<? extends anyClass>名称 =null；
+
+				eg：
+					A<? extends List>a = null;
+					a = new A<ArrayList> ();    // 正确
+					b = new A<LinkedList> ();    // 正确
+					c = new A<HashMap> ();    // 错误
+
+		继承泛型类或实现泛型接口：
+			泛型类和泛型接口也可以被继承和实现。
+
+				eg：
+				    public class FatherClass<T1>{}
+			    	public class SonClass<T1,T2,T3> extents FatherClass<T1>{}
+			        interface interface1<T1>{}
+			    	interface SubClass<T1,T2,T3> implements
+			    	Interface1<T2>{}
+
+	    	在继承泛型类是如果需要保留父类的泛型类型，就必须在继承时指定，否则泛型会直接回归Object类型。
+
+枚举：
+	枚举是一个被命名的常数的集合，用于声明一组带标识的常数（jdk5+）。
+
+	声明枚举：
+		enum-modifiers enum enumname : enum-base{enum-body,};
+		//enum-modifiers主要包括public，private和internal；enumname是枚举名称；enum-base表示基础类型；enum-body表示枚举成员，是枚举类型的命名常数。
+
+		枚举成员不能重名，成员的常数值必须在枚举的基础类型的范围之内，多个成员以逗号分隔，如果没有显式声明基础类型，则枚举默认基础类型为int。访问时，通过“枚举类型的名称.成员名”的形式直接访问。
+
+	枚举类：
+		java枚举继承自java.lang.enum类，枚举被看作enum类的实例。枚举的成员默认被public、final、static修饰，枚举可以调用Enum类的方法。
+
+			Enum类常用方法：
+				values() 		以数组形式返回枚举类型的所有成员
+				valueOf() 		将普通字符串转换为枚举实例
+				compareTo() 	比较两个枚举成员在定义时的顺序
+				ordinal() 		获取枚举成员的索引位置
+
+	向枚举中添加方法：
+		java中枚举类型拥有一些内置的方法，同时枚举常量也可以拥有自己的方法，像枚举中添加方法时，枚举的最后一个成员必须添加分号，而且必须首先定义枚举成员再添加方法（或变量），枚举中添加的方法也可以对其基类进行重写。
+
+	EnumMap与EnumSet：
+		java.util包中有两个类EnumMap和EnumSet，可以高效操作枚举类型。
+
+		EnumMap类：
+			EnumMap类是为枚举定制的Map实现，其他Map实现也可以胜任存储枚举，但EnumMap会更加高效。HashMap 只能接收同一枚举类型的实例作为键值，并且由于枚举类型实例的数量相对固定并且有限，所以 EnumMap 使用数组来存放与枚举类型对应的值，使得 EnumMap 的效率非常高。 
+
+		EnumSet类：
+			EnumSet类是为枚举类型定制的高性能Set实现，要求放入的枚举常量必须属于同一枚举类型，支持对包含的枚举常量的遍历。
+
+			EnumSet常用方法：
+				allOf(Class<E> element type) 	创建一个包含指定枚举类型中所有枚举成员的 EnumSet 对象
+				complementOf(EnumSet<E> s) 		创建一个与指定 EnumSet 对象 s 相同的枚举类型 EnumSet 对象，并包含所有 s 中未包含的枚举成员
+				copyOf(EnumSet<E> s) 			创建一个与指定 EnumSet 对象 s 相同的枚举类型 EnumSet 对象，并与 s 包含相同的枚举成员
+				noneOf(<Class<E> elementType) 	创建指定枚举类型的空 EnumSet 对象
+				of(E first,e...rest) 			创建包含指定枚举成员的 EnumSet 对象
+				range(E from ,E to) 			创建一个 EnumSet 对象，该对象包含了 from 到 to 之间的所有枚举成员
 
 
 @@
@@ -2276,19 +2351,3 @@ File文件操作类：
 #
 
 
-
-
-#Spring
->>>>>
-
-
-@
-
-$$
-
-
-@@
-
-
->>>>>
-#
